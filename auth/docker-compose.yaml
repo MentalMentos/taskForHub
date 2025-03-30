@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  pg:
+    image: postgres:14-alpine3.17
+    environment:
+      - POSTGRES_DB=${PG_DATABASE_NAME}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+    ports:
+      - "${PG_PORT}:5432"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrator:
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    depends_on:
+      pg:
+        condition: service_healthy
+    environment:
+      PG_DSN: host=pg port=5432 dbname=postgres user=user password=1234 sslmode=disable
+      MIGRATION_DIR: ${MIGRATION_DIR}
+
+volumes:
+  postgres_volume:
