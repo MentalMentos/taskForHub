@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/MentalMentos/taskForHub/auth/internal/data/request"
+	"github.com/MentalMentos/taskForHub/auth/internal/data/response"
+	"github.com/MentalMentos/taskForHub/auth/internal/model"
+	"github.com/MentalMentos/taskForHub/auth/internal/repository"
+	"github.com/MentalMentos/taskForHub/auth/pkg/helpers"
+	"github.com/MentalMentos/taskForHub/auth/pkg/logger"
+	"github.com/MentalMentos/taskForHub/auth/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
-	"task0325/auth/internal/data/request"
-	"task0325/auth/internal/data/response"
-	"task0325/auth/internal/model"
-	"task0325/auth/internal/repository"
-	"task0325/auth/pkg/helpers"
-	"task0325/auth/pkg/logger"
-	"task0325/auth/pkg/utils"
 )
 
 type Auth interface {

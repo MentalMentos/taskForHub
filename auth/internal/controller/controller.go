@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"github.com/MentalMentos/taskForHub/auth/internal/data/request"
+	"github.com/MentalMentos/taskForHub/auth/internal/service"
+	"github.com/MentalMentos/taskForHub/auth/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"task0325/auth/internal/data/request"
-	"task0325/auth/internal/service"
-	"task0325/auth/pkg/logger"
 )
 
 type AuthController struct {

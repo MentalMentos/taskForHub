@@ -2,11 +2,11 @@ package controller
 
 import (
 	"fmt"
+	"github.com/MentalMentos/taskForHub/auth/internal/data/response"
 	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"strings"
-	"task0325/auth/internal/data/response"
 )
 
 type ApiError struct {

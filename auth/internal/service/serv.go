@@ -1,8 +1,8 @@
 package service
 
 import (
-	"task0325/auth/internal/repository"
-	"task0325/auth/pkg/logger"
+	"github.com/MentalMentos/taskForHub/auth/internal/repository"
+	"github.com/MentalMentos/taskForHub/auth/pkg/logger"
 )
 
 type Service struct {

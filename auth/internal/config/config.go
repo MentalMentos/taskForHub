@@ -2,12 +2,12 @@ package config
 
 import (
 	"fmt"
+	"github.com/MentalMentos/taskForHub/auth/pkg/helpers"
+	"github.com/MentalMentos/taskForHub/auth/pkg/logger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"os"
 	"sync"
-	"task0325/auth/pkg/helpers"
-	"task0325/auth/pkg/logger"
 )
 
 type Config struct {

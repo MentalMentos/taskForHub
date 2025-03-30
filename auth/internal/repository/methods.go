@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 	"errors"
+	"github.com/MentalMentos/taskForHub/auth/internal/data/request"
+	"github.com/MentalMentos/taskForHub/auth/internal/model"
+	"github.com/MentalMentos/taskForHub/auth/pkg/logger"
 	"gorm.io/gorm"
-	"task0325/auth/internal/data/request"
-	"task0325/auth/internal/model"
-	"task0325/auth/pkg/logger"
 )
 
 type RepoImpl struct {
