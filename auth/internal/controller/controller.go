@@ -27,7 +27,6 @@ func (controller *AuthController) Register(c *gin.Context) {
 		return
 	}
 
-	userRequest.IP = GetClientIP(c)
 	authResp, err := controller.authService.Register(c, userRequest)
 	if err != nil {
 		HandleError(c, err)
@@ -44,7 +43,6 @@ func (controller *AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	userRequest.IP = GetClientIP(c)
 	authResp, err := controller.authService.Login(c, userRequest)
 	if err != nil {
 		HandleError(c, err)
@@ -52,23 +50,6 @@ func (controller *AuthController) Login(c *gin.Context) {
 	}
 
 	JsonResponse(c, http.StatusOK, "Auth successful", authResp)
-}
-
-func (controller *AuthController) UpdatePassword(c *gin.Context) {
-	var userRequest request.UpdateUserRequest
-	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		HandleError(c, &ApiError{Code: http.StatusBadRequest, Message: "Invalid request payload"})
-		return
-	}
-
-	userRequest.IP = GetClientIP(c)
-	authResp, err := controller.authService.UpdatePassword(c, userRequest)
-	if err != nil {
-		HandleError(c, err)
-		return
-	}
-
-	JsonResponse(c, http.StatusOK, "Password updated successful", authResp)
 }
 
 func (controller *AuthController) RefreshToken(c *gin.Context) {

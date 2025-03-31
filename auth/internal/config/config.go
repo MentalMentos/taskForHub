@@ -1,13 +1,16 @@
 package config
 
 import (
+	"context"
 	"fmt"
-	"github.com/MentalMentos/taskForHub/auth/pkg/helpers"
 	"github.com/MentalMentos/taskForHub/auth/pkg/logger"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+
 	"os"
 	"sync"
+	"time"
 )
 
 type Config struct {
@@ -44,12 +47,26 @@ func New(logger logger.Logger) *Config {
 	return &config
 }
 
-func DatabaseConnection(logger logger.Logger) *gorm.DB {
-	dsn := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", host, user, password, dbName)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func DataBaseConnection() {
+	uri := "mongodb://user:password@localhost:27017/dbname"
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
-		logger.Fatal(helpers.PgPrefix, helpers.PgConnectFailed)
+		log.Fatal(err)
 	}
-	logger.Info(helpers.PgPrefix, "Database connection done")
-	return db
+
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			panic(err)
+		}
+	}()
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Connected to MongoDB!")
+
 }

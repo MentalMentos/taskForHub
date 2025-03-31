@@ -1,12 +1,16 @@
 package main
 
 import (
-	"github.com/MentalMentos/ginWeb-Tonik/ginWeb/internal/config"
-	"github.com/MentalMentos/ginWeb-Tonik/ginWeb/internal/controller"
-	"github.com/MentalMentos/ginWeb-Tonik/ginWeb/internal/model"
-	"github.com/MentalMentos/ginWeb-Tonik/ginWeb/internal/repository"
-	"github.com/MentalMentos/ginWeb-Tonik/ginWeb/internal/service"
-	zaplogger "github.com/MentalMentos/ginWeb-Tonik/ginWeb/pkg/logger/zap"
+	"github.com/MentalMentos/taskForHub/auth/internal/config"
+	"github.com/MentalMentos/taskForHub/auth/internal/controller"
+	"github.com/MentalMentos/taskForHub/auth/internal/repository"
+	"github.com/MentalMentos/taskForHub/auth/internal/service"
+	zaplogger "github.com/MentalMentos/taskForHub/auth/pkg/logger/zap"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+import (
+	zaplogger
 	"github.com/gin-gonic/gin"
 	_ "github.com/gin-gonic/gin"
 	_ "github.com/go-playground/validator/v10"
@@ -25,9 +29,7 @@ func main() {
 		c.JSON(200, gin.H{"ip": clientIP})
 	})
 	log := zaplogger.New()
-	db := config.DatabaseConnection(log)
-	//validate := validator.New()
-	db.Table("users").AutoMigrate(&model.User{})
+	db := config.DataBaseConnection
 
 	authRepository := repository.NewRepository(db, log)
 	authService := service.New(authRepository, log)

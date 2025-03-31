@@ -3,102 +3,108 @@ package repository
 import (
 	"context"
 	"errors"
-	"github.com/MentalMentos/taskForHub/auth/internal/data/request"
+	"fmt"
 	"github.com/MentalMentos/taskForHub/auth/internal/model"
+	"github.com/MentalMentos/taskForHub/auth/pkg/helpers"
 	"github.com/MentalMentos/taskForHub/auth/pkg/logger"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type RepoImpl struct {
-	DB     *gorm.DB
+	DB     *mongo.Database
 	logger logger.Logger
 }
 
-func NewRepo(db *gorm.DB, logger logger.Logger) *RepoImpl {
+func NewRepo(db *mongo.Database, logger logger.Logger) *RepoImpl {
 	return &RepoImpl{
-		db,
-		logger,
+		DB:     db,
+		logger: logger,
 	}
 }
 
-func (r *RepoImpl) Create(ctx context.Context, us model.User, logger logger.Logger) (int64, error) {
-	if err := r.DB.WithContext(ctx).Create(&us).Error; err != nil {
-		return 0, errors.New("cannot create new user")
+func (r *RepoImpl) Create(ctx context.Context, user model.User) (string, error) {
+	collection := r.DB.Collection("users")
+
+	// Создаем новый ObjectID для пользователя
+	user.ID = primitive.NewObjectID()
+
+	_, err := collection.InsertOne(ctx, user)
+	if err != nil {
+		r.logger.Info(helpers.RepoPrefix, err.Error())
+		return "", fmt.Errorf("failed to insert user: %w", err)
 	}
-	return us.ID, nil
+
+	r.logger.Info("repo_create_user", "successful")
+	return user.ID.Hex(), nil
 }
 
-func (r *RepoImpl) Update(ctx context.Context, us model.User, logger logger.Logger) (int64, error) {
-	updateData := request.UpdateUserRequest{
-		Name:  us.Name,
-		Email: us.Email,
-	}
+func (r *RepoImpl) GetByEmail(ctx context.Context, email string) (model.User, error) {
+	collection := r.DB.Collection("users")
 
-	if err := r.DB.WithContext(ctx).Model(&model.User{}).Where("id = ?", us.ID).Updates(updateData).Error; err != nil {
-		return 0, errors.New("cannot update user")
-	}
-	return us.ID, nil
-}
+	filter := bson.M{"email": email}
 
-func (r *RepoImpl) Delete(ctx context.Context, usId int64, logger logger.Logger) error {
-	if err := r.DB.WithContext(ctx).Delete(&model.User{}, usId).Error; err != nil {
-		return errors.New("cannot delete user")
-	}
-	return nil
-}
-
-func (r *RepoImpl) UpdatePassword(ctx context.Context, us model.User, hashPassword string, logger logger.Logger) (model.User, error) {
-	updateUser := request.UpdateUserRequest{
-		Name:     us.Name,
-		Email:    us.Email,
-		Password: hashPassword,
-	}
-	if err := r.DB.WithContext(ctx).Updates(&updateUser).Error; err != nil {
-		return model.User{}, errors.New("cannot update password")
-	}
-	return us, nil
-}
-
-func (r *RepoImpl) GetByEmail(ctx context.Context, email string, logger logger.Logger) (model.User, error) {
 	var user model.User
-	if err := r.DB.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return user, errors.New("user not found")
+	err := collection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return model.User{}, errors.New("user not found")
 		}
-		return user, err
+		r.logger.Info("Failed to get user by email:", err.Error())
+		return model.User{}, fmt.Errorf("cannot get user by email: %w", err)
 	}
+
 	return user, nil
 }
 
-func (r *RepoImpl) GetByID(ctx context.Context, userID int64, logger logger.Logger) (model.User, error) {
-	var user model.User
-	if err := r.DB.WithContext(ctx).First(&user, userID).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return user, errors.New("user not found")
-		}
-		return user, err
+func (r *RepoImpl) GetByID(ctx context.Context, userID string) (model.User, error) {
+	collection := r.DB.Collection("users")
+
+	objectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return model.User{}, errors.New("invalid user ID format")
 	}
+
+	filter := bson.M{"_id": objectID}
+
+	var user model.User
+	err = collection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return model.User{}, errors.New("user not found")
+		}
+		r.logger.Info("Failed to get user by ID:", err.Error())
+		return model.User{}, fmt.Errorf("cannot get user by ID: %w", err)
+	}
+
 	return user, nil
 }
 
-func (r *RepoImpl) GetAll(ctx context.Context, logger logger.Logger) ([]model.User, error) {
+func (r *RepoImpl) GetAll(ctx context.Context) ([]model.User, error) {
+	collection := r.DB.Collection("users")
+
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		r.logger.Info("Failed to get all users:", err.Error())
+		return nil, fmt.Errorf("cannot get all users: %w", err)
+	}
+	defer cursor.Close(ctx)
+
 	var users []model.User
-	if err := r.DB.WithContext(ctx).Find(&users).Error; err != nil {
-		return nil, errors.New("users not found")
+	for cursor.Next(ctx) {
+		var user model.User
+		if err := cursor.Decode(&user); err != nil {
+			r.logger.Info("Failed to decode user:", err.Error())
+			return nil, fmt.Errorf("failed to decode user: %w", err)
+		}
+		users = append(users, user)
 	}
+
+	if err := cursor.Err(); err != nil {
+		r.logger.Info("Cursor error:", err.Error())
+		return nil, fmt.Errorf("cursor error: %w", err)
+	}
+
 	return users, nil
-}
-
-func (r *RepoImpl) UpdateIP(ctx context.Context, us model.User, ip string, logger logger.Logger) (model.User, error) {
-	updateUser := request.UpdateUserRequest{
-		Name:     us.Name,
-		Email:    us.Email,
-		Password: us.Password,
-		IP:       ip,
-	}
-
-	if err := r.DB.WithContext(ctx).Updates(&updateUser).Error; err != nil {
-		return us, errors.New("cannot update password")
-	}
-	return us, nil
 }

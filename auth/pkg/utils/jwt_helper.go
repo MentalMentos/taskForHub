@@ -8,17 +8,15 @@ import (
 var jwtSecret = []byte("secret_key")
 
 type Claims struct {
-	UserID int64  `json:"user_id"`
-	Role   string `json:"role"`
+	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
 // GenerateJWT создает access и refresh токены.
-func GenerateJWT(userID int64, role string) (accessToken string, refreshToken string, err error) {
+func GenerateJWT(userID string) (accessToken string, refreshToken string, err error) {
 	// Генерация Access Token
 	accessClaims := &Claims{
 		UserID: userID,
-		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
 		},
@@ -31,7 +29,6 @@ func GenerateJWT(userID int64, role string) (accessToken string, refreshToken st
 	// Генерация Refresh Token
 	refreshClaims := &Claims{
 		UserID: userID,
-		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(7 * 24 * time.Hour)),
 		},

@@ -1,11 +1,11 @@
 package helpers
 
 const (
-	FailedToCreateUser    = "FAILED_TO_CREATE_ELEMENT" // FailedToCreateElement contains error message for failed to create element
-	FailedToDeleteUser    = "FAILED_TO_DELETE_ELEMENT" // FailedToDeleteElement contains error message for failed to delete element
-	FailedToGetUser       = "FAILED_TO_GET_ELEMENTS"   // FailedToGetElements contains error message for failed to get elements
-	JSONParseError        = "JSON_PARSE_ERROR"         // JSONParseError contains error message for failed to parse json
-	DefaultValueForFields = "NOT FOUND"                // DefaultValueForFields contains default value for fields
+	FailedToCreateUser    = "FAILED_TO_CREATE_USER" // FailedToCreateElement contains error message for failed to create element
+	FailedToDeleteUser    = "FAILED_TO_DELETE_USER" // FailedToDeleteElement contains error message for failed to delete element
+	FailedToGetUser       = "FAILED_TO_GET_USER"    // FailedToGetElements contains error message for failed to get elements
+	JSONParseError        = "JSON_PARSE_ERROR"      // JSONParseError contains error message for failed to parse json
+	DefaultValueForFields = "NOT FOUND"             // DefaultValueForFields contains default value for fields
 	FailedToHashPass      = "FAILED_TO_HASH_PASSWORD"
 	FailedToGenJWT        = "FAILED_TO_GEN_JWT"
 
@@ -19,14 +19,10 @@ const (
 	UnmarshalError = "UNMARSHAL_ERROR" // UnmarshalError contains error message for unmarshal error
 	ReadBodyError  = "READ_BODY_ERROR" // ReadBodyError contains error message for read body error
 
-	PgPrefix            = " [ POSTGRES ] "                     // PgPrefix contains database prefix for logs
-	ReconnectDB         = "RECONNECTING TO DATABASE..."        // ReconnectDB contains reconnect db message
-	DisconnectDB        = "DISCONNECTED FROM DATABASE"         // DisconnectDB contains disconnect db message
-	PgConnectFailed     = "FAILED TO CONNECT TO DATABASE"      // PgConnectFailed contains error message for failed to connect to database
-	PgConnectSuccess    = "SUCCESSFULLY CONNECTED TO POSTGRES" // PgConnectSuccess contains success message for successfully connected to database
-	PgTransactionFailed = "FAILED TO FETCH TRANSACTION"        // PgTransactionFailed contains error message for failed to fetch transaction
-	PgMigrateFailed     = "FAILED TO MIGRATE DATABASE"         // PgMigrateFailed contains error message for failed to migrate database
-	NoRowsAffected      = "NO ROWS AFFECTED"                   // NoRowsAffected contains error message for no rows affected
-	FailedToRollback    = "FAILED TO ROLLBACK"                 // FailedToRollback contains error message for failed to rollback
-	FailedToClose       = "FAILED TO CLOSE"                    // FailedToClose contains error message for failed to close
+	RepoPrefix     = " [ REPOSITORY ] "
+	ReconnectDB    = "RECONNECTING TO DATABASE..."
+	DisconnectDB   = "DISCONNECTED FROM DATABASE"
+	ConnectFailed  = "FAILED TO CONNECT TO DATABASE"
+	ConnectSuccess = "SUCCESSFULLY CONNECTED TO MONGO DATABASE"
+	FailedToClose  = "FAILED TO CLOSE"
 )

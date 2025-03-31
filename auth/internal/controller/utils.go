@@ -1,12 +1,9 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/MentalMentos/taskForHub/auth/internal/data/response"
 	"github.com/gin-gonic/gin"
-	"net"
 	"net/http"
-	"strings"
 )
 
 type ApiError struct {
@@ -32,28 +29,4 @@ func JsonResponse(c *gin.Context, status int, message string, data interface{}) 
 		Status: message,
 		Data:   data,
 	})
-}
-
-func GetClientIP(c *gin.Context) string {
-	xForwardedFor := c.GetHeader("X-Forwarded-For")
-	if xForwardedFor != "" {
-		ips := strings.Split(xForwardedFor, ",")
-		clientIP := strings.TrimSpace(ips[0])
-		fmt.Printf("X-Forwarded-For: %s, Resolved IP: %s\n", xForwardedFor, clientIP)
-		return clientIP
-	}
-
-	xRealIP := c.GetHeader("X-Real-IP")
-	if xRealIP != "" {
-		fmt.Printf("X-Real-IP: %s\n", xRealIP)
-		return xRealIP
-	}
-
-	ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
-	if err != nil {
-		fmt.Printf("RemoteAddr (raw): %s, Error: %v\n", c.Request.RemoteAddr, err)
-		return c.Request.RemoteAddr
-	}
-	fmt.Printf("RemoteAddr (parsed): %s\n", ip)
-	return ip
 }
