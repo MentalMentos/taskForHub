@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"github.com/MentalMentos/taskForHub/book/internal/model"
+	"github.com/MentalMentos/taskForHub/books/internal/model"
 	"github.com/kamva/mgm/v3"
 )
 

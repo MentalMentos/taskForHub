@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"github.com/MentalMentos/taskForHub/books/internal/model"
+	"github.com/MentalMentos/taskForHub/books/internal/service"
 	"net/http"
 
-	"github.com/MentalMentos/taskForHub/book/internal/model"
-	"github.com/MentalMentos/taskForHub/book/internal/service"
 	"github.com/gin-gonic/gin"
 )
 

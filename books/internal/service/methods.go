@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"github.com/MentalMentos/taskForHub/book/internal/model"
-	"github.com/MentalMentos/taskForHub/book/internal/repository"
+	"github.com/MentalMentos/taskForHub/books/internal/model"
+	"github.com/MentalMentos/taskForHub/books/internal/repository"
 )
 
 type BookService struct {

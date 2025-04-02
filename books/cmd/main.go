@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/MentalMentos/taskForHub/book/internal/config"
-	"github.com/MentalMentos/taskForHub/book/internal/controller"
-	"github.com/MentalMentos/taskForHub/book/internal/repository"
-	"github.com/MentalMentos/taskForHub/book/internal/service"
+	"github.com/MentalMentos/taskForHub/books/internal/config"
+	"github.com/MentalMentos/taskForHub/books/internal/controller"
+	"github.com/MentalMentos/taskForHub/books/internal/repository"
+	"github.com/MentalMentos/taskForHub/books/internal/service"
 	"github.com/gin-gonic/gin"
-	"github.com/kamva/mgm/v3"
+	_ "github.com/kamva/mgm/v3"
 )
 
 func main() {
