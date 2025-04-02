@@ -1,88 +1,51 @@
 package controller
 
 import (
-	"github.com/MentalMentos/taskForHub/auth/internal/data/request"
-	"github.com/MentalMentos/taskForHub/auth/internal/service"
-	"github.com/MentalMentos/taskForHub/auth/pkg/logger"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/MentalMentos/taskForHub/book/internal/model"
+	"github.com/MentalMentos/taskForHub/book/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
-type AuthController struct {
-	authService service.Service
-	logger      logger.Logger
+type BookController struct {
+	service *service.BookService
 }
 
-func NewAuthController(authService *service.Service, logger logger.Logger) *AuthController {
-	return &AuthController{
-		authService: *authService,
-		logger:      logger,
-	}
+func NewBookController(service *service.BookService) *BookController {
+	return &BookController{service: service}
 }
 
-func (controller *AuthController) Register(c *gin.Context) {
-	var userRequest request.RegisterUserRequest
-	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		HandleError(c, &ApiError{Code: http.StatusBadRequest, Message: "Invalid request payload"})
+// @Summary Добавить книгу
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param book body model.Book true "Book"
+// @Success 200 {string} string "Book added successfully"
+// @Router /books [post]
+func (c *BookController) CreateBook(ctx *gin.Context) {
+	var book model.Book
+	if err := ctx.ShouldBindJSON(&book); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if err := c.service.CreateBook(ctx, &book); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, "Book added successfully")
+}
 
-	userRequest.IP = GetClientIP(c)
-	authResp, err := controller.authService.Register(c, userRequest)
+// @Summary Получить все книги
+// @Tags books
+// @Produce json
+// @Success 200 {array} model.Book
+// @Router /books [get]
+func (c *BookController) GetAllBooks(ctx *gin.Context) {
+	books, err := c.service.GetAllBooks(ctx)
 	if err != nil {
-		HandleError(c, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	JsonResponse(c, http.StatusOK, "Registration successful", authResp)
-}
-
-func (controller *AuthController) Login(c *gin.Context) {
-	var userRequest request.LoginRequest
-	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		HandleError(c, &ApiError{Code: http.StatusBadRequest, Message: "Invalid request payload"})
-		return
-	}
-
-	userRequest.IP = GetClientIP(c)
-	authResp, err := controller.authService.Login(c, userRequest)
-	if err != nil {
-		HandleError(c, err)
-		return
-	}
-
-	JsonResponse(c, http.StatusOK, "Auth successful", authResp)
-}
-
-func (controller *AuthController) UpdatePassword(c *gin.Context) {
-	var userRequest request.UpdateUserRequest
-	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		HandleError(c, &ApiError{Code: http.StatusBadRequest, Message: "Invalid request payload"})
-		return
-	}
-
-	userRequest.IP = GetClientIP(c)
-	authResp, err := controller.authService.UpdatePassword(c, userRequest)
-	if err != nil {
-		HandleError(c, err)
-		return
-	}
-
-	JsonResponse(c, http.StatusOK, "Password updated successful", authResp)
-}
-
-func (controller *AuthController) RefreshToken(c *gin.Context) {
-	var userRequest request.UpdateTokenRequest
-	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		HandleError(c, &ApiError{Code: http.StatusBadRequest, Message: "Invalid request payload"})
-		return
-	}
-
-	authResp, err := controller.authService.GetAccessToken(c, userRequest.RefreshToken)
-	if err != nil {
-		HandleError(c, err)
-		return
-	}
-
-	JsonResponse(c, http.StatusOK, "Token refreshed successful", authResp)
+	ctx.JSON(http.StatusOK, books)
 }

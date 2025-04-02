@@ -9,14 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
-import (
-	zaplogger
-	"github.com/gin-gonic/gin"
-	_ "github.com/gin-gonic/gin"
-	_ "github.com/go-playground/validator/v10"
-	"net/http"
-)
 
+// @title Auth Service API
+// @version 1.0
+// @description This is an authentication service.
+
+// @host localhost:8080
+// @BasePath /
 func main() {
 	router := gin.Default()
 	router.SetTrustedProxies(nil) // Доверять всем прокси
@@ -28,8 +27,10 @@ func main() {
 		clientIP := c.ClientIP() // Автоматически извлекает IP с учётом заголовков X-Forwarded-For, X-Real-IP
 		c.JSON(200, gin.H{"ip": clientIP})
 	})
+
 	log := zaplogger.New()
-	db := config.DataBaseConnection
+	cfg := config.New(log)
+	db := config.DataBaseConnection(cfg)
 
 	authRepository := repository.NewRepository(db, log)
 	authService := service.New(authRepository, log)
@@ -37,12 +38,10 @@ func main() {
 
 	authRoutes := router.Group("/auth_v1")
 	{
-		authRoutes.POST("/register", authController.Register)             // Регистрация
-		authRoutes.POST("/login", authController.Login)                   // Вход
-		authRoutes.POST("/refresh", authController.RefreshToken)          // Обновление токена
-		authRoutes.PUT("/update-password", authController.UpdatePassword) // Обновление пароля
+		authRoutes.POST("/register", authController.Register)    // Регистрация
+		authRoutes.POST("/login", authController.Login)          // Вход
+		authRoutes.POST("/refresh", authController.RefreshToken) // Обновление токена
 	}
-
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal("Main", "Failed to start server")
 	}
