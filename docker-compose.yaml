@@ -1,20 +1,51 @@
 version: '3.8'
 
 services:
-  mongodb:
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME}
+  mongo:
+    image: mongo:6
+    container_name: mongo
     ports:
-      - "${MONGO_PORT}:27017"
+      - "27017:27017"
+    restart: always
+    environment:
+      - MONGO_USER=user
+      - MONGO_PASSWORD=1234
+      - MONGO_DATABASE_NAME=mongo
+      - MONGO_PORT=27017
     volumes:
-      - mongodb_data:/data/db
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --eval 'db.runCommand(\"ping\").ok'"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - mongo_data:/data/db
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./auth/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://user:1234@mongo:27017
+
+  books:
+    build:
+      context: .
+      dockerfile: ./books/Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://user:1234@mongo:27017
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth
+      - books
+
 volumes:
-  mongodb_data:
+  mongo_data:
