@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/MentalMentos/taskForHub/сart/internal/config"
 	"github.com/MentalMentos/taskForHub/сart/internal/controller"
 	"github.com/MentalMentos/taskForHub/сart/internal/repository"
 	"github.com/MentalMentos/taskForHub/сart/internal/service"
@@ -20,6 +21,8 @@ func main() {
 
 	r := gin.Default()
 
+	config.InitMongoDB()
+
 	repo := repository.NewCartRepository()
 	svc := service.NewCartService(repo)
 	ctrl := controller.NewCartController(svc)
@@ -31,5 +34,5 @@ func main() {
 		api.DELETE("/:user_id/remove/:product_id", ctrl.RemoveFromCart)
 	}
 
-	r.Run(":8082")
+	r.Run("localhost:8083")
 }

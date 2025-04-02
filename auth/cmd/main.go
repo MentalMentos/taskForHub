@@ -10,12 +10,6 @@ import (
 	"net/http"
 )
 
-// @title Auth Service API
-// @version 1.0
-// @description This is an authentication service.
-
-// @host localhost:8080
-// @BasePath /
 func main() {
 	router := gin.Default()
 	router.SetTrustedProxies(nil) // Доверять всем прокси
@@ -42,7 +36,7 @@ func main() {
 		authRoutes.POST("/login", authController.Login)          // Вход
 		authRoutes.POST("/refresh", authController.RefreshToken) // Обновление токена
 	}
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run("localhost:8081"); err != nil {
 		log.Fatal("Main", "Failed to start server")
 	}
 }
