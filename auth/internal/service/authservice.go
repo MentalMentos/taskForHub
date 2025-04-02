@@ -52,13 +52,14 @@ func (s *AuthService) Register(ctx context.Context, req request.RegisterUserRequ
 	}
 
 	return &model.AuthResponse{
+		Id:           userid,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
 func (s *AuthService) Login(ctx context.Context, req request.LoginRequest) (*model.AuthResponse, error) {
-	user, err := s.repo.GetByEmail(ctx, req.Email)
+	user, userId, err := s.repo.GetByEmail(ctx, req.Email)
 	if err != nil {
 		s.logger.Fatal("[ SERVICE_LOGIN ]", helpers.FailedToGetUser)
 		return nil, errors.New("user not found")
@@ -77,6 +78,7 @@ func (s *AuthService) Login(ctx context.Context, req request.LoginRequest) (*mod
 	}
 
 	return &model.AuthResponse{
+		Id:           userId,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil

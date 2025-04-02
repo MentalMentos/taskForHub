@@ -2,38 +2,41 @@ package controller
 
 import (
 	"github.com/MentalMentos/taskForHub/books/internal/model"
-	"github.com/MentalMentos/taskForHub/books/internal/service"
-	"net/http"
-
+	"github.com/MentalMentos/taskForHub/books/internal/repository"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type BookController struct {
-	service *service.BookService
+	repo *repository.BookRepository
 }
 
-func NewBookController(service *service.BookService) *BookController {
-	return &BookController{service: service}
+func NewBookController(repo *repository.BookRepository) *BookController {
+	return &BookController{repo: repo}
 }
 
 func (c *BookController) CreateBook(ctx *gin.Context) {
 	var book model.Book
 	if err := ctx.ShouldBindJSON(&book); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
-	if err := c.service.CreateBook(ctx, &book); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	err := c.repo.Create(ctx, &book)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create book"})
 		return
 	}
-	ctx.JSON(http.StatusOK, "Book added successfully")
+
+	ctx.JSON(http.StatusOK, book)
 }
 
 func (c *BookController) GetAllBooks(ctx *gin.Context) {
-	books, err := c.service.GetAllBooks(ctx)
+	books, err := c.repo.GetAll(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch books"})
 		return
 	}
+
 	ctx.JSON(http.StatusOK, books)
 }

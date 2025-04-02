@@ -40,7 +40,7 @@ func (r *RepoImpl) Create(ctx context.Context, user model.User) (string, error) 
 	return user.ID.Hex(), nil
 }
 
-func (r *RepoImpl) GetByEmail(ctx context.Context, email string) (model.User, error) {
+func (r *RepoImpl) GetByEmail(ctx context.Context, email string) (model.User, string, error) {
 	collection := r.DB.Collection("users")
 
 	filter := bson.M{"email": email}
@@ -49,13 +49,13 @@ func (r *RepoImpl) GetByEmail(ctx context.Context, email string) (model.User, er
 	err := collection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return model.User{}, errors.New("user not found")
+			return model.User{}, "", errors.New("user not found")
 		}
 		r.logger.Info("Failed to get user by email:", err.Error())
-		return model.User{}, fmt.Errorf("cannot get user by email: %w", err)
+		return model.User{}, "", fmt.Errorf("cannot get user by email: %w", err)
 	}
-
-	return user, nil
+	userID := user.ID.Hex()
+	return user, userID, nil
 }
 
 func (r *RepoImpl) GetByID(ctx context.Context, userID string) (model.User, error) {

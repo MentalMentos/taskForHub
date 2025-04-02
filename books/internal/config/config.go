@@ -1,10 +1,12 @@
 package config
 
 import (
+	"context"
+	"fmt"
 	"log"
-	"sync"
+	"time"
 
-	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -17,29 +19,26 @@ const (
 	MONGO_DBNAME   = "mongo"
 )
 
-type Config struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	DBName   string
-}
+// DataBaseConnection создает подключение к базе данных MongoDB
+func DataBaseConnection() *mongo.Database {
+	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s/%s?authSource=admin&authMechanism=SCRAM-SHA-256",
+		MONGO_USER, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT, MONGO_DBNAME)
 
-var (
-	config Config
-	once   sync.Once
-)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-func New(logger logger.Logger) *Config {
-	once.Do(func() {
-		config = Config{
-			Host:     MONGO_HOST,
-			Port:     MONGO_PORT,
-			Username: MONGO_USER,
-			Password: MONGO_PASSWORD,
-			DBName:   MONGO_DBNAME,
-		}
-	})
-	logger.Info("Config", "Config init")
-	return &config
+	clientOptions := options.Client().ApplyURI(uri)
+
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatalf("Ошибка при подключении к MongoDB: %v", err)
+	}
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatalf("Ошибка при пинге MongoDB: %v", err)
+	}
+
+	fmt.Println("Connected to MongoDB!")
+	return client.Database(MONGO_DBNAME)
 }

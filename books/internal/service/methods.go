@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/MentalMentos/taskForHub/books/internal/model"
 	"github.com/MentalMentos/taskForHub/books/internal/repository"
+	"github.com/labstack/gommon/log"
 )
 
 type BookService struct {
@@ -15,6 +16,7 @@ func NewBookService(repo *repository.BookRepository) *BookService {
 }
 
 func (s *BookService) CreateBook(ctx context.Context, book *model.Book) error {
+	log.Info("service", book)
 	return s.repo.Create(ctx, book)
 }
 

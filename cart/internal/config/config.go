@@ -1,13 +1,12 @@
 package config
 
 import (
+	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
-	"sync"
 	"time"
 
-	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -20,36 +19,10 @@ const (
 	MONGO_DBNAME   = "mongo"
 )
 
-type Config struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	DBName   string
-}
-
-var (
-	config Config
-	once   sync.Once
-)
-
-func New(logger logger.Logger) *Config {
-	once.Do(func() {
-		config = Config{
-			Host:     MONGO_HOST,
-			Port:     MONGO_PORT,
-			Username: MONGO_USER,
-			Password: MONGO_PASSWORD,
-			DBName:   MONGO_DBNAME,
-		}
-	})
-	logger.Info("Config", "Config init")
-	return &config
-}
-
-func DataBaseConnection(cfg *Config) *mongo.Database {
+// DataBaseConnection создает подключение к базе данных MongoDB
+func DataBaseConnection() *mongo.Database {
 	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s/%s?authSource=admin&authMechanism=SCRAM-SHA-256",
-		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
+		MONGO_USER, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT, MONGO_DBNAME)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -67,5 +40,5 @@ func DataBaseConnection(cfg *Config) *mongo.Database {
 	}
 
 	fmt.Println("Connected to MongoDB!")
-	return client.Database(cfg.DBName)
+	return client.Database(MONGO_DBNAME)
 }

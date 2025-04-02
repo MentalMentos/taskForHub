@@ -1,10 +1,10 @@
 package model
 
-import "github.com/kamva/mgm/v3"
+import "go.mongodb.org/mongo-driver/bson/primitive"
 
-// Book - структура книги
+// Book представляет книгу в MongoDB
 type Book struct {
-	mgm.DefaultModel `bson:",inline"` // Встроенные ID и таймстампы
-	Author           string           `json:"author" bson:"author"`
-	Title            string           `json:"title" bson:"title"`
+	ID     primitive.ObjectID `bson:"_id,omitempty"`
+	Author string             `bson:"author"`
+	Title  string             `bson:"title"`
 }

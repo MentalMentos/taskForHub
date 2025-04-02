@@ -4,23 +4,24 @@ import (
 	"github.com/MentalMentos/taskForHub/books/internal/config"
 	"github.com/MentalMentos/taskForHub/books/internal/controller"
 	"github.com/MentalMentos/taskForHub/books/internal/repository"
-	"github.com/MentalMentos/taskForHub/books/internal/service"
 	"github.com/gin-gonic/gin"
-	_ "github.com/kamva/mgm/v3"
 )
 
 func main() {
-	// Инициализируем MongoDB
-	config.InitMongoDB()
+	// Инициализация базы данных MongoDB
+	db := config.DataBaseConnection()
 
+	// Инициализация репозитория и контроллера
+	repo := repository.NewBookRepository(db)
+	controller := controller.NewBookController(repo)
+
+	// Инициализация Gin
 	r := gin.Default()
 
-	bookRepo := repository.NewBookRepository()
-	bookService := service.NewBookService(bookRepo)
-	bookController := controller.NewBookController(bookService)
+	// Роуты
+	r.POST("/books", controller.CreateBook)
+	r.GET("/books", controller.GetAllBooks)
 
-	r.POST("/books", bookController.CreateBook)
-	r.GET("/books", bookController.GetAllBooks)
-
-	r.Run("localhost:8082")
+	// Запуск сервера
+	r.Run(":8082")
 }

@@ -9,7 +9,7 @@ import (
 
 type Repository interface {
 	Create(ctx context.Context, us model.User) (string, error)
-	GetByEmail(ctx context.Context, email string) (model.User, error)
+	GetByEmail(ctx context.Context, email string) (model.User, string, error)
 	GetByID(ctx context.Context, userID string) (model.User, error)
 	GetAll(ctx context.Context) ([]model.User, error)
 }
