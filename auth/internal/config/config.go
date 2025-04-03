@@ -11,7 +11,6 @@ import (
 	"time"
 )
 
-// Определите константы для конфигурации MongoDB
 const (
 	MONGO_HOST     = "localhost"
 	MONGO_PORT     = "27017"

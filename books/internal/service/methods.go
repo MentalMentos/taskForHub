@@ -27,7 +27,3 @@ func (s *BookService) GetAllBooks(ctx context.Context) ([]model.Book, error) {
 func (s *BookService) GetBookByID(ctx context.Context, id string) (*model.Book, error) {
 	return s.repo.GetByID(ctx, id)
 }
-
-func (s *BookService) DeleteBook(ctx context.Context, id string) error {
-	return s.repo.Delete(ctx, id)
-}

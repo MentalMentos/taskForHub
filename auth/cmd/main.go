@@ -12,13 +12,13 @@ import (
 
 func main() {
 	router := gin.Default()
-	router.SetTrustedProxies(nil) // Доверять всем прокси
+	router.SetTrustedProxies(nil)
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, "Welcome Home!")
 	})
 	router.GET("/ip", func(c *gin.Context) {
 		// Получаем IP клиента
-		clientIP := c.ClientIP() // Автоматически извлекает IP с учётом заголовков X-Forwarded-For, X-Real-IP
+		clientIP := c.ClientIP()
 		c.JSON(200, gin.H{"ip": clientIP})
 	})
 
@@ -32,9 +32,9 @@ func main() {
 
 	authRoutes := router.Group("/auth_v1")
 	{
-		authRoutes.POST("/register", authController.Register)    // Регистрация
-		authRoutes.POST("/login", authController.Login)          // Вход
-		authRoutes.POST("/refresh", authController.RefreshToken) // Обновление токена
+		authRoutes.POST("/register", authController.Register)
+		authRoutes.POST("/login", authController.Login)
+		authRoutes.POST("/refresh", authController.RefreshToken)
 	}
 	if err := router.Run("localhost:8081"); err != nil {
 		log.Fatal("Main", "Failed to start server")

@@ -27,7 +27,6 @@ func NewRepo(db *mongo.Database, logger logger.Logger) *RepoImpl {
 func (r *RepoImpl) Create(ctx context.Context, user model.User) (string, error) {
 	collection := r.DB.Collection("users")
 
-	// Создаем новый ObjectID для пользователя
 	user.ID = primitive.NewObjectID()
 
 	_, err := collection.InsertOne(ctx, user)

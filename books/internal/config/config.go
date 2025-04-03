@@ -10,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Определите константы для конфигурации MongoDB
 const (
 	MONGO_HOST     = "localhost"
 	MONGO_PORT     = "27017"
@@ -19,7 +18,6 @@ const (
 	MONGO_DBNAME   = "mongo"
 )
 
-// DataBaseConnection создает подключение к базе данных MongoDB
 func DataBaseConnection() *mongo.Database {
 	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s/%s?authSource=admin&authMechanism=SCRAM-SHA-256",
 		MONGO_USER, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT, MONGO_DBNAME)

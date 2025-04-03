@@ -21,7 +21,6 @@ func NewBookRepository(db *mongo.Database) *BookRepository {
 func (r *BookRepository) Create(ctx context.Context, book *model.Book) error {
 	collection := r.DB.Collection("books")
 
-	// Создаем новый ObjectID для книги
 	book.ID = primitive.NewObjectID()
 
 	_, err := collection.InsertOne(ctx, book)

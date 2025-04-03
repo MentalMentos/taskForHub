@@ -84,9 +84,7 @@ func (s *AuthService) Login(ctx context.Context, req request.LoginRequest) (*mod
 	}, nil
 }
 
-// Метод для обновления access token
 func (s *AuthService) GetAccessToken(ctx context.Context, refreshToken string) (*response.AuthResponse, error) {
-	// Валидация refresh token
 	claims, err := utils.ValidateJWT(refreshToken)
 	if err != nil {
 		s.logger.Fatal("[ SERVICE_GET_ACCESS_TOKEN ]", "failed to validate tokens")
